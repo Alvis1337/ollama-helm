@@ -32,6 +32,8 @@ spec:
               value: http://{{ include "ollama.fullname" . }}:11434
             - name: WEBUI_AUTH
               value: "false"
+            - name: USER_AGENT
+              value: "open-webui/1.0"
           readinessProbe:
             httpGet:
               path: /
