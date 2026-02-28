@@ -40,6 +40,10 @@ spec:
           env:
             - name: OLLAMA_MODELS
               value: /models
+            {{- if .Values.ollama.gpu.enabled }}
+            - name: HSA_OVERRIDE_GFX_VERSION
+              value: {{ .Values.ollama.gpu.hsaOverrideGfxVersion | quote }}
+            {{- end }}
           readinessProbe:
             httpGet:
               path: /api/tags
@@ -55,10 +59,25 @@ spec:
             periodSeconds: 30
             failureThreshold: 5
           resources:
+            {{- if .Values.ollama.gpu.enabled }}
+            requests:
+              cpu: "1"
+              memory: 2Gi
+              amd.com/gpu: "1"
+            limits:
+              cpu: "4"
+              memory: 4Gi
+              amd.com/gpu: "1"
+            {{- else }}
             {{- toYaml .Values.ollama.resources | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: models
               mountPath: /models
+      {{- if .Values.ollama.gpu.enabled }}
+      nodeSelector:
+        amd.com/gpu.present: "true"
+      {{- end }}
       volumes:
         - name: models
           persistentVolumeClaim:

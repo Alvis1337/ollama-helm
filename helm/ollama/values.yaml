@@ -7,6 +7,7 @@ ollama:
     pullPolicy: IfNotPresent
   # Model to pull on first start. Subsequent restarts skip download if already cached.
   # CPU-friendly options: qwen2.5-coder:7b (~4.7GB), llama3.2:3b (~2GB), qwen2.5-coder:1.5b (~1GB)
+  # GPU options (12GB VRAM): qwen2.5-coder:14b, llama3.1:8b, mistral:7b
   model: qwen2.5-coder:1.5b
   persistence:
     size: 30Gi
@@ -18,6 +19,14 @@ ollama:
     limits:
       cpu: "4"
       memory: 8Gi
+
+  # GPU support — set enabled: true after ROCm drivers are installed on the
+  # worker node and the node is labeled: amd.com/gpu.present=true
+  # Also bump the model to something worthy of the VRAM (e.g. qwen2.5-coder:14b)
+  gpu:
+    enabled: false
+    # HSA_OVERRIDE_GFX_VERSION is required for the RX 6700 XT (gfx1031)
+    hsaOverrideGfxVersion: "10.3.0"
 
 webui:
   enabled: true
