@@ -1,0 +1,49 @@
+---
+# Deny all ingress by default.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# Allow the Envoy Gateway to reach Open WebUI.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-webui-from-gateway
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: webui
+  ingress:
+    - ports:
+        - port: 8080
+          protocol: TCP
+  policyTypes:
+    - Ingress
+---
+# Allow Open WebUI to reach Ollama.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ollama-from-webui
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: ollama
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: webui
+      ports:
+        - port: 11434
+          protocol: TCP
+  policyTypes:
+    - Ingress

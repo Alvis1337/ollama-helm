@@ -1,0 +1,41 @@
+replicaCount: 1
+
+ollama:
+  image:
+    repository: ollama/ollama
+    tag: latest
+    pullPolicy: IfNotPresent
+  # Model to pull on first start. Subsequent restarts skip download if already cached.
+  # CPU-friendly options: qwen2.5-coder:7b (~4.7GB), llama3.2:3b (~2GB), qwen2.5-coder:1.5b (~1GB)
+  model: qwen2.5-coder:7b
+  persistence:
+    size: 30Gi
+    storageClass: kakariko-block
+  resources:
+    requests:
+      cpu: "2"
+      memory: 6Gi
+    limits:
+      cpu: "4"
+      memory: 8Gi
+
+webui:
+  enabled: true
+  image:
+    repository: ghcr.io/open-webui/open-webui
+    tag: main
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+httproute:
+  enabled: true
+  hostname: ai.chrisalvis.me
+  gateway:
+    name: kakariko-gateway
+    namespace: default

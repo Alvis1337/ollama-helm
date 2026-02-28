@@ -1,0 +1,51 @@
+{{- if .Values.webui.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ollama.fullname" . }}-webui
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ollama.labels" . | nindent 4 }}
+    app.kubernetes.io/component: webui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "ollama.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: webui
+  template:
+    metadata:
+      labels:
+        {{- include "ollama.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: webui
+    spec:
+      containers:
+        - name: open-webui
+          image: "{{ .Values.webui.image.repository }}:{{ .Values.webui.image.tag }}"
+          imagePullPolicy: {{ .Values.webui.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: OLLAMA_BASE_URL
+              value: http://{{ include "ollama.fullname" . }}:11434
+            - name: WEBUI_AUTH
+              value: "false"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 5
+          resources:
+            {{- toYaml .Values.webui.resources | nindent 12 }}
+{{- end }}
