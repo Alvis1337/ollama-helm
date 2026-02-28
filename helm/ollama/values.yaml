@@ -7,7 +7,7 @@ ollama:
     pullPolicy: IfNotPresent
   # Model to pull on first start. Subsequent restarts skip download if already cached.
   # CPU-friendly options: qwen2.5-coder:7b (~4.7GB), llama3.2:3b (~2GB), qwen2.5-coder:1.5b (~1GB)
-  model: qwen2.5-coder:7b
+  model: qwen2.5-coder:1.5b
   persistence:
     size: 30Gi
     storageClass: kakariko-block
