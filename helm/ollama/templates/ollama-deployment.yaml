@@ -28,7 +28,7 @@ spec:
             - |
               ollama serve &
               SERVER_PID=$!
-              until curl -sf http://localhost:11434/api/tags > /dev/null; do sleep 2; done
+              until ollama list > /dev/null 2>&1; do sleep 2; done
               ollama pull {{ .Values.ollama.model }}
               wait $SERVER_PID
           ports:
